@@ -4,7 +4,8 @@ import cv2
 import pytesseract
 import os
 
-
+correct_count = 0
+processed_count = 0
 
 def processAllInFolder(dir):
     for file in os.listdir(dir):
@@ -52,6 +53,9 @@ def getLpText(d):
     return text
 
 
+def getLPfromFileName(fp):
+    fp = fp.split('/')
+
 def processLp(img):
 
     gImg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -72,17 +76,22 @@ def processLp(img):
 
     #edges = cv2.Canny(blurred,100,150)
     # showPic(threshInv)
+    
 
-    threshInv = cv2.erode(threshInv,kernel,iterations=2)
+
+    threshInv = cv2.erode(threshInv,kernel,iterations=1)
     # showPic(threshInv)
-    threshInv = cv2.dilate(threshInv,kernel,iterations=2)
+    threshInv = cv2.dilate(threshInv,kernel,iterations=1)
     # showPic(threshInv)
+
     return threshInv
 
 
 
 
 def processImg(imgfile):
+    global correct_count
+    global processed_count
     lpDict = {}
     img = cv2.imread(imgfile)
     imS = img.copy()
@@ -158,9 +167,10 @@ def processImg(imgfile):
                     x, y, w, h = cv2.boundingRect(license_plate_contour)
                     # print(w,h)
                     # license_plate = imS[y:y+h+10, x:x+w+10]
-                    license_plate = gImg[y:y+h+10, x:x+w+10]
                     # license_plateg = processLp(license_plate)
-                    license_plateg = cv2.threshold(license_plate, 100, 255,cv2.THRESH_BINARY_INV )[1]
+                    license_plate = gImg[y:y+h+10, x:x+w+10]
+                    # print("iteration ",i,j)
+                    license_plateg = cv2.threshold(license_plate, 100, 255,cv2.THRESH_BINARY )[1]
                     # showPic(license_plateg)
                     # print("shape: ",license_plateg.shape)
                     lpText = pytesseract.image_to_string(license_plateg, config=options)
@@ -173,6 +183,8 @@ def processImg(imgfile):
                         cv2.waitKey(0)
                         parsed = parseLpText(lpText)
                         if parsed:
+
+                            # showPic(license_plateg)
                             lpDict[parsed] = lpDict.get(parsed, 0)+1
                     ## TODO: Once we hace the rectangle of an image, we need to do a Character recognision, to check if there are 4 nums and 3 chars
                     ## Also, we can check if there is a small tall rectangle
@@ -182,7 +194,14 @@ def processImg(imgfile):
                     # cv2.imshow("Image",edges)
                     # cv2.waitKey(0)
                     #break
-    print('best hit: ',getLpText(lpDict))
+    processed_count +=1
+    best_hit =  getLpText(lpDict)
+    print('best hit: ',best_hit)
+    correctLP = imgfile.split('/')[-1][:-4]
+    
+    if best_hit == correctLP:
+        print('correct found!!!!!')
+        correct_count += 1
     print(imgfile)
     saveImage('filtered',imgfile,imS)
     saveImage('test',imgfile,test)
@@ -198,11 +217,11 @@ def processImg(imgfile):
 dir = 'Images/Frontal'
 
 processAllInFolder(dir)
-# processImg('Images/Frontal/5488LKV.jpg')
+# processImg('Images/Lateral/3044JMB.jpg')
 # oneImg ='3587DCXlp.jpg' 
 # img = cv2.imread(oneImg)
 # processLp(img)
-
+print('processed: ',processed_count,"/  correct: ",correct_count)
 
 
 
