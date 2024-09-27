@@ -157,16 +157,19 @@ def processImg(imgfile):
 
                     x, y, w, h = cv2.boundingRect(license_plate_contour)
                     # print(w,h)
-                    license_plate = imS[y:y+h+10, x:x+w+10]
-                    license_plateg = processLp(license_plate)
-                    # license_plateg = cv2.threshold(license_plate, 100, 255,cv2.THRESH_BINARY_INV )[1]
+                    # license_plate = imS[y:y+h+10, x:x+w+10]
+                    license_plate = gImg[y:y+h+10, x:x+w+10]
+                    # license_plateg = processLp(license_plate)
+                    license_plateg = cv2.threshold(license_plate, 100, 255,cv2.THRESH_BINARY_INV )[1]
+                    # showPic(license_plateg)
+                    # print("shape: ",license_plateg.shape)
                     lpText = pytesseract.image_to_string(license_plateg, config=options)
                     if lpText and len(lpText) >= 7:
                         print(lpText)
-                        cv2.imshow('test',license_plate)
+                        # cv2.imshow('test',license_plate)
                         cv2.waitKey(0)
 
-                        cv2.imshow('test',license_plateg)
+                        # cv2.imshow('test',license_plateg)
                         cv2.waitKey(0)
                         parsed = parseLpText(lpText)
                         if parsed:
@@ -194,8 +197,8 @@ def processImg(imgfile):
 
 dir = 'Images/Lateral'
 
-# processAllInFolder(dir)
-processImg('Images/Lateral/3587DCX.jpg')
+processAllInFolder(dir)
+# processImg('Images/Lateral/3044JMB.jpg')
 # oneImg ='3587DCXlp.jpg' 
 # img = cv2.imread(oneImg)
 # processLp(img)
