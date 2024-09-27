@@ -195,10 +195,10 @@ def processImg(imgfile):
 ## MAIN FUNC BELOW
 
 
-dir = 'Images/Lateral'
+dir = 'Images/Frontal'
 
 processAllInFolder(dir)
-# processImg('Images/Lateral/3044JMB.jpg')
+# processImg('Images/Frontal/5488LKV.jpg')
 # oneImg ='3587DCXlp.jpg' 
 # img = cv2.imread(oneImg)
 # processLp(img)
