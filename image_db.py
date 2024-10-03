@@ -3,9 +3,9 @@ import numpy as np
 import cv2
 import os
 
-source_folders = ["Frontal", "Lateral", "Nico"]
+source_folders = ["Frontal", "Lateral", "Nico", "Others"]
 
-def get_images(max=10, exclude_tags="onb") -> list[(str, np.array)]:
+def get_images(max=10, exclude_tags="onb", source_folders=source_folders) -> list[(str, np.array)]:
     # Tags to include optionally are 
     # -n: night
     # -o: ocluded
@@ -18,7 +18,12 @@ def get_images(max=10, exclude_tags="onb") -> list[(str, np.array)]:
         
         image_paths = os.listdir(os.path.join("Images", folder))
         
+        return_count = 0
+        
         for image_name in image_paths:
+            
+            if return_count > max: # Stop function execution
+                return
             
             # Exptected Label Schema: 1234UAB-on.jpg
             # <numbers><LETTERS>-<tags>.jpg
@@ -30,14 +35,7 @@ def get_images(max=10, exclude_tags="onb") -> list[(str, np.array)]:
                 
                 continue
             
-            labels += [license_plate]
-            images += [cv2.imread(os.path.join("Images", folder, image_name))]
+            label = license_plate
+            image = cv2.imread(os.path.join("Images", folder, image_name))
             
-    if len(images) < max:
-        max = len(images)       
-    
-    return labels[:max], images[:max]
-            
-labels, images = get_images()
-
-print(labels)
+            yield label, image
