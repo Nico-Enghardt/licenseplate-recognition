@@ -5,7 +5,7 @@ import os
 
 source_folders = ["Frontal", "Lateral", "Nico", "Others"]
 
-def get_images(max=10, exclude_tags="onb", source_folders=source_folders) -> list[(str, np.array)]:
+def get_data(max=10, exclude_tags="onb", source_folders=source_folders) -> iter:
     # Tags to include optionally are 
     # -n: night
     # -o: ocluded
@@ -39,3 +39,10 @@ def get_images(max=10, exclude_tags="onb", source_folders=source_folders) -> lis
             image = cv2.imread(os.path.join("Images", folder, image_name))
             
             yield label, image
+            
+            return_count += 1
+            
+if __name__ == "__main__":
+    
+    for i, (label, image) in enumerate(get_data()):
+        print(i, label)
