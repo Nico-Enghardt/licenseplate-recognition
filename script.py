@@ -4,9 +4,12 @@ import cv2
 import pytesseract
 import os
 import numpy as np
+from matplotlib import pyplot as plt
 
 correct_count = 0
 processed_count = 0
+
+wrong_lp_arr = []
 
 def processAllInFolder(dir):
     for file in os.listdir(dir):
@@ -87,72 +90,98 @@ def processLp(img):
 
     return threshInv
 
-def processLpV2(img):
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+def order_points(pts):
+    # Step 1: Find centre of object
+    center = np.mean(pts)
 
-# Apply GaussianBlur to reduce noise and improve edge detection
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    # Step 2: Move coordinate system to centre of object
+    shifted = pts - center
 
-# Apply Canny edge detection
-    edges = cv2.Canny(blurred, 50, 200)
+    # Step #3: Find angles subtended from centroid to each corner point
+    theta = np.arctan2(shifted[:, 0], shifted[:, 1])
 
-    contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    # Step #4: Return vertices ordered by theta
+    ind = np.argsort(theta)
+    return pts[ind]
 
-# Loop over the contours to find potential license plate candidates
-    license_plate_contour = None
-    for contour in contours:
-        # Approximate the contour
-        epsilon = 0.02 * cv2.arcLength(contour, True)
-        approx = cv2.approxPolyDP(contour, epsilon, True)
+def getContours(img, orig, ):  # Change - pass the original image too
+    image = orig.copy()
+    biggest = np.array([])
+    maxArea = 0
+    imgContour = orig.copy()  # Make a copy of the original image to return
+    contours, hierarchy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    index = None
+    for i, cnt in enumerate(contours):  # Change - also provide index
+        area = cv2.contourArea(cnt)
+        if area > 500:
+            peri = cv2.arcLength(cnt, True)
+            approx = cv2.approxPolyDP(cnt,0.02*peri, True)
+            if area > maxArea and len(approx) == 4:
+                biggest = approx
+                maxArea = area
+                index = i  # Also save index to contour
 
-        # A license plate is likely to have 4 points (rectangular shape)
-        if len(approx) == 4:
-            # Check for the aspect ratio to ensure it is likely a license plate
-            (x, y, w, h) = cv2.boundingRect(approx)
-            aspect_ratio = w / float(h)
-            if 2 < aspect_ratio < 6:  # Common aspect ratio range for license plates
-                license_plate_contour = approx
-       # Rearrange contour points for perspective transform
-                pts = license_plate_contour.reshape(4, 2)
-    
-                # Get a consistent order of the points (top-left, top-right, bottom-right, bottom-left)
-                rect = np.zeros((4, 2), dtype="float32")
+    warped = None  # Stores the warped license plate image
+    if index is not None: # Draw the biggest contour on the image
+        cv2.drawContours(imgContour, contours, index, (255, 0, 0), 3)
 
-                # Find the top-left and bottom-right points based on the sum of the coordinates
-                s = pts.sum(axis=1)
-                rect[0] = pts[np.argmin(s)]  # top-left
-                rect[2] = pts[np.argmax(s)]  # bottom-right
+        src = np.squeeze(biggest).astype(np.float32) # Source points
+        height = image.shape[0]
+        width = image.shape[1]
+        # Destination points
+        dst = np.float32([[0, 0], [0, height - 1], [width - 1, 0], [width - 1, height - 1]])
 
-                # Find the top-right and bottom-left based on the difference
-                diff = np.diff(pts, axis=1)
-                rect[1] = pts[np.argmin(diff)]  # top-right
-                rect[3] = pts[np.argmax(diff)]  # bottom-left
+        # Order the points correctly
+        biggest = order_points(src)
+        dst = order_points(dst)
 
-                # Define the dimensions of the new perspective (a rectangle)
-                width_a = np.linalg.norm(rect[2] - rect[3])
-                width_b = np.linalg.norm(rect[1] - rect[0])
-                max_width = max(int(width_a), int(width_b))
+        # Get the perspective transform
+        M = cv2.getPerspectiveTransform(src, dst)
 
-                height_a = np.linalg.norm(rect[1] - rect[2])
-                height_b = np.linalg.norm(rect[0] - rect[3])
-                max_height = max(int(height_a), int(height_b))
+        # Warp the image
+        img_shape = (width, height)
+        warped = cv2.warpPerspective(orig, M, img_shape, flags=cv2.INTER_LINEAR)
 
-                # The destination points for the perspective transform (a straight rectangle)
-                dst = np.array([
-                    [0, 0],
-                    [max_width - 1, 0],
-                    [max_width - 1, max_height - 1],
-                    [0, max_height - 1]
-                ], dtype="float32")
+    return biggest, imgContour, warped  # Change - also return drawn image
 
-                # Apply the perspective transformation matrix
-                M = cv2.getPerspectiveTransform(rect, dst)
-                warped = cv2.warpPerspective(img, M, (max_width, max_height))
 
-                # Show the corrected license plate
-                cv2.imshow('Warped License Plate', warped)
-                cv2.waitKey(0)
 
+def straighten_lp(image):
+    kernel = np.ones((15,10))
+    first_erode_kernel = np.ones((2,2))
+    # image = cv2.imread(image)
+
+
+    imgGray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    imgBlur = cv2.GaussianBlur(imgGray,(7,7),2)
+    imgCanny = cv2.Canny(imgBlur,150,200)
+    # imgErode1 = cv2.erode(imgCanny, first_erode_kernel, iterations=1)
+    imgDial = cv2.dilate(imgCanny,kernel,iterations=2)
+    imgThres = cv2.erode(imgDial,kernel,iterations=2)
+    biggest, imgContour, warped = getContours(imgThres, image)  # Change
+
+    titles = ['Original', 'Blur', 'Canny', 'Dilate', 'Threshold', 'Contours', 'Warped']  # Change - also show warped image
+    images = [image[...,::-1],  imgBlur, imgCanny, imgDial, imgThres, imgContour, warped]  # Change
+
+    return warped, titles, images
+
+# Change - Also show contour drawn image + warped image
+
+def show_all_images(titles, images):
+    for i in range(5):
+        plt.subplot(3, 3, i+1)
+        plt.imshow(images[i], cmap='gray')
+        plt.title(titles[i])
+
+    plt.subplot(3, 3, 6)
+    plt.imshow(images[-2])
+    plt.title(titles[-2])
+
+    plt.subplot(3, 3, 8)
+    plt.imshow(images[-1])
+    plt.title(titles[-1])
+
+    plt.show()
 
 
 def processImg(imgfile):
@@ -223,7 +252,7 @@ def processImg(imgfile):
             # contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
             contours = imutils.grab_contours(contours)
             contours = sorted(contours, key=cv2.contourArea, reverse=True)
-            min_width = 300
+            min_width = 400
             min_height = 50
             # print(contours)
             test = imS.copy()
@@ -241,9 +270,26 @@ def processImg(imgfile):
                     # print(w,h)
                     # license_plate = imS[y:y+h+10, x:x+w+10]
                     # license_plateg = processLp(license_plate)
-                    license_plate = gImg[y:y+h+10, x:x+w+10]
+                    if x >= 50 and y >= 50:
+
+                        license_plate = imS[y-50:y+h+50, x-50:x+w+50]
+                    else:
+                        license_plate = imS[y:y+h+50, x:x+w+50]
+                    warped, titles, images = straighten_lp(license_plate)
+
+                    if warped is not None:
+                        license_plate = warped
+                        show_all_images(titles,images)
                     # print("iteration ",i,j)
+                    # convert it to gray scale
+                    license_plate = cv2.cvtColor(license_plate, cv2.COLOR_BGR2GRAY)
+                    # blurr a bit
+
+                    license_plate = cv2.GaussianBlur(license_plate,(7,7),2)
                     license_plateg = cv2.threshold(license_plate, 100, 255,cv2.THRESH_BINARY )[1]
+
+                    # showPic(license_plateg)
+                    
                     # showPic(license_plateg)
                     # print("shape: ",license_plateg.shape)
                     lpText = pytesseract.image_to_string(license_plateg, config=options)
@@ -262,7 +308,7 @@ def processImg(imgfile):
                             lpDict[parsed] = lpDict.get(parsed, 0)+1
                     ## TODO: Once we hace the rectangle of an image, we need to do a Character recognision, to check if there are 4 nums and 3 chars
                     ## Also, we can check if there is a small tall rectangle
-                    # cv2.rectangle(imS, (x,y), (x+w,y+h), (0,255,0),3)
+                    cv2.rectangle(img, (x,y), (x+w,y+h), (0,255,0),3)
                     # cv2.imshow("Image",imS)
                     # cv2.waitKey(0)
                     # cv2.imshow("Image",edges)
@@ -278,8 +324,10 @@ def processImg(imgfile):
     if best_hit == correctLP:
         print('correct found!!!!!')
         correct_count += 1
+    else:
+        wrong_lp_arr.append(correctLP)
     print(imgfile)
-    saveImage('filtered',imgfile,imS)
+    saveImage('filtered',imgfile,img)
     saveImage('test',imgfile,test)
 
 #ap = argparse.ArgumentParser()
@@ -290,14 +338,17 @@ def processImg(imgfile):
 ## MAIN FUNC BELOW
 
 
-dir = 'Images/Frontal'
+dir = 'Images/Lateral'
 
 # processAllInFolder(dir)
 # processImg('Images/Lateral/3044JMB.jpg')
-oneImg ='3587DCXlp.jpg' 
-img = cv2.imread(oneImg)
-processLpV2(img)
+processImg('Images/Lateral/0907JRF.jpg')
+# oneImg ='3587DCXlp.jpg' 
+# img = cv2.imread(oneImg)
+# processLpV2(img)
 print('processed: ',processed_count,"/  correct: ",correct_count)
+if wrong_lp_arr:
+    print("License plates incorrectly recognized: " ,wrong_lp_arr)
 # print("Ratio: ",processed_count / correct_count)
 
 

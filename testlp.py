@@ -1,4 +1,5 @@
 import cv2
+import pytesseract
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -16,7 +17,8 @@ def order_points(pts):
     ind = np.argsort(theta)
     return pts[ind]
 
-def getContours(img, orig):  # Change - pass the original image too
+def getContours(img, orig, ):  # Change - pass the original image too
+    image = orig.copy()
     biggest = np.array([])
     maxArea = 0
     imgContour = orig.copy()  # Make a copy of the original image to return
@@ -55,34 +57,55 @@ def getContours(img, orig):  # Change - pass the original image too
 
     return biggest, imgContour, warped  # Change - also return drawn image
 
-kernel = np.ones((17,12))
-first_erode_kernel = np.ones((2,2))
-image = cv2.imread('3587DCXlp.jpg')
 
 
-imgGray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-imgBlur = cv2.GaussianBlur(imgGray,(7,7),2)
-imgCanny = cv2.Canny(imgBlur,150,200)
-# imgErode1 = cv2.erode(imgCanny, first_erode_kernel, iterations=1)
-imgDial = cv2.dilate(imgCanny,kernel,iterations=2)
-imgThres = cv2.erode(imgDial,kernel,iterations=2)
-biggest, imgContour, warped = getContours(imgThres, image)  # Change
+def straighten_lp(image):
+    kernel = np.ones((17,12))
+    first_erode_kernel = np.ones((2,2))
+    image = cv2.imread('3587DCXlp.jpg')
 
-titles = ['Original', 'Blur', 'Canny', 'Dilate', 'Threshold', 'Contours', 'Warped']  # Change - also show warped image
-images = [image[...,::-1],  imgBlur, imgCanny, imgDial, imgThres, imgContour, warped]  # Change
+
+    imgGray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    imgBlur = cv2.GaussianBlur(imgGray,(7,7),2)
+    imgCanny = cv2.Canny(imgBlur,150,200)
+    # imgErode1 = cv2.erode(imgCanny, first_erode_kernel, iterations=1)
+    imgDial = cv2.dilate(imgCanny,kernel,iterations=2)
+    imgThres = cv2.erode(imgDial,kernel,iterations=2)
+    biggest, imgContour, warped = getContours(imgThres, image)  # Change
+
+    titles = ['Original', 'Blur', 'Canny', 'Dilate', 'Threshold', 'Contours', 'Warped']  # Change - also show warped image
+    images = [image[...,::-1],  imgBlur, imgCanny, imgDial, imgThres, imgContour, warped]  # Change
+
+    return warped, titles, images
 
 # Change - Also show contour drawn image + warped image
-for i in range(5):
-    plt.subplot(3, 3, i+1)
-    plt.imshow(images[i], cmap='gray')
-    plt.title(titles[i])
 
-plt.subplot(3, 3, 6)
-plt.imshow(images[-2])
-plt.title(titles[-2])
+def show_all_images(titles, images):
+    for i in range(5):
+        plt.subplot(3, 3, i+1)
+        plt.imshow(images[i], cmap='gray')
+        plt.title(titles[i])
 
-plt.subplot(3, 3, 8)
-plt.imshow(images[-1])
-plt.title(titles[-1])
+    plt.subplot(3, 3, 6)
+    plt.imshow(images[-2])
+    plt.title(titles[-2])
 
-plt.show()
+    plt.subplot(3, 3, 8)
+    plt.imshow(images[-1])
+    plt.title(titles[-1])
+
+    plt.show()
+
+img = '3587DCXlp.jpg'
+warped, titles, images = straighten_lp(img)
+
+show_all_images(titles,images)
+
+
+alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+options = "-c tessedit_char_whitelist={}".format(alphanumeric)
+	# set the PSM mode
+options += " --psm {}".format(7)
+lpText = pytesseract.image_to_string(warped, config=options)
+
+print(lpText)

@@ -1,0 +1,236 @@
+Images/Frontal/1062FNT.jpg
+Y B1062FNT
+
+license:  1062FNT
+Y B1062FNT
+
+license:  1062FNT
+B1062FNT
+
+license:  1062FNT
+B1062FNT
+
+license:  1062FNT
+best hit:  1062FNT
+Processed  22  rectangles.
+Found  4 rectangles that had at least 7 characters
+correct found!!!!!
+Images/Frontal/1062FNT.jpg
+Images/Frontal/1565HTS.jpg
+best hit:  
+Processed  37  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Frontal/1565HTS.jpg
+Images/Frontal/2153GYX.jpg
+B2153GYX
+
+license:  2153GYX
+8215367X
+
+21536YX
+
+221536YX
+
+best hit:  2153GYX
+Processed  16  rectangles.
+Found  4 rectangles that had at least 7 characters
+correct found!!!!!
+Images/Frontal/2153GYX.jpg
+Images/Frontal/2929KXJ.jpg
+A2929KXJ
+
+license:  2929KXJ
+A2929KXJ
+
+license:  2929KXJ
+A2929KXJ
+
+license:  2929KXJ
+IBA292
+
+best hit:  2929KXJ
+Processed  30  rectangles.
+Found  4 rectangles that had at least 7 characters
+correct found!!!!!
+Images/Frontal/2929KXJ.jpg
+Images/Frontal/3340JMF.jpg
+63340JMF
+
+license:  3340JMF
+63340JMF
+
+license:  3340JMF
+63340JMF
+
+license:  3340JMF
+XS P 2
+
+3340JMF
+
+license:  3340JMF
+3340JMF
+
+license:  3340JMF
+143340
+
+143340
+
+63340JMF
+
+license:  3340JMF
+63340JMF
+
+license:  3340JMF
+3340JMF
+
+license:  3340JMF
+143340
+
+143340
+
+143340
+
+143340
+
+best hit:  3340JMF
+Processed  23  rectangles.
+Found  15 rectangles that had at least 7 characters
+correct found!!!!!
+Images/Frontal/3340JMF.jpg
+Images/Frontal/3587DCX.jpg
+best hit:  
+Processed  13  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Frontal/3587DCX.jpg
+Images/Frontal/4674FHC.jpg
+84674FHC
+
+license:  4674FHC
+84674FHC
+
+license:  4674FHC
+84674FHC
+
+license:  4674FHC
+JB4674FHC
+
+license:  4674FHC
+84674FHC
+
+license:  4674FHC
+B4674FHC
+
+license:  4674FHC
+B4674FHC
+
+license:  4674FHC
+B4674FHC
+
+license:  4674FHC
+B4674FHC
+
+license:  4674FHC
+J4674FHC
+
+license:  4674FHC
+best hit:  4674FHC
+Processed  15  rectangles.
+Found  10 rectangles that had at least 7 characters
+correct found!!!!!
+Images/Frontal/4674FHC.jpg
+Images/Frontal/5275HGY.jpg
+85275HGY
+
+license:  5275HGY
+15275HGY
+
+license:  5275HGY
+95275HGY
+
+license:  5275HGY
+best hit:  5275HGY
+Processed  22  rectangles.
+Found  3 rectangles that had at least 7 characters
+correct found!!!!!
+Images/Frontal/5275HGY.jpg
+Images/Frontal/5488LKV.jpg
+best hit:  
+Processed  36  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Frontal/5488LKV.jpg
+Images/Frontal/5796DKP.jpg
+best hit:  
+Processed  25  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Frontal/5796DKP.jpg
+Images/Frontal/7067KSH.jpg
+A7067KSH
+
+license:  7067KSH
+H7067KSH
+
+license:  7067KSH
+87067KSHI
+
+license:  7067KSH
+187067KSH
+
+license:  7067KSH
+187067KSH
+
+license:  7067KSH
+187067KSH
+
+license:  7067KSH
+187067KSH
+
+license:  7067KSH
+87067 K
+
+47067 KS
+
+87067 KS
+
+best hit:  7067KSH
+Processed  13  rectangles.
+Found  10 rectangles that had at least 7 characters
+correct found!!!!!
+Images/Frontal/7067KSH.jpg
+Images/Frontal/7153JWD.jpg
+best hit:  
+Processed  21  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Frontal/7153JWD.jpg
+Images/Frontal/8727JTC.jpg
+AN TTI Y I
+
+AX RTA 1
+
+Y 3 SS 1
+
+A CL Z
+
+PSFH 3
+
+best hit:  
+Processed  23  rectangles.
+Found  5 rectangles that had at least 7 characters
+Images/Frontal/8727JTC.jpg
+Images/Frontal/9247CZG.jpg
+A 9245
+
+best hit:  
+Processed  29  rectangles.
+Found  1 rectangles that had at least 7 characters
+Images/Frontal/9247CZG.jpg
+Images/Frontal/9892JFR.jpg
+9892JFR
+
+license:  9892JFR
+best hit:  9892JFR
+Processed  28  rectangles.
+Found  1 rectangles that had at least 7 characters
+correct found!!!!!
+Images/Frontal/9892JFR.jpg
+processed:  15 /  correct:  8
+License plates incorrectly recognized:  ['1565HTS', '3587DCX', '5488LKV', '5796DKP', '7153JWD', '8727JTC', '9247CZG']

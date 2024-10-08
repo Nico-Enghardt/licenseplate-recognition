@@ -1,0 +1,213 @@
+Images/Lateral/0182GLK.jpg
+0182 CLKI
+
+H0182GLKI
+
+license:  0182GLK
+HOI82CLKT
+
+HO182CLKT
+
+HO2CLKT
+
+00182GLKI
+
+license:  0182GLK
+20182GLK
+
+license:  0182GLK
+0182GLK
+
+license:  0182GLK
+10182GLKI
+
+license:  0182GLK
+10182GLKI
+
+license:  0182GLK
+best hit:  0182GLK
+Processed  24  rectangles.
+Found  10 rectangles that had at least 7 characters
+correct found!!!!!
+Images/Lateral/0182GLK.jpg
+Images/Lateral/0907JRF.jpg
+best hit:  
+Processed  9  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Lateral/0907JRF.jpg
+Images/Lateral/1498JBZ.jpg
+W984B7
+
+OUTLULULULU
+
+best hit:  
+Processed  18  rectangles.
+Found  2 rectangles that had at least 7 characters
+Images/Lateral/1498JBZ.jpg
+Images/Lateral/1556GMZ.jpg
+best hit:  
+Processed  12  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Lateral/1556GMZ.jpg
+Images/Lateral/2344KJP.jpg
+best hit:  
+Processed  35  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Lateral/2344KJP.jpg
+Images/Lateral/3044JMB.jpg
+best hit:  
+Processed  37  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Lateral/3044JMB.jpg
+Images/Lateral/3587DCX.jpg
+3587DCX
+
+license:  3587DCX
+3587DCX
+
+license:  3587DCX
+3587DCY
+
+license:  3587DCY
+3587DCY
+
+license:  3587DCY
+3587DCX
+
+license:  3587DCX
+3587DCX
+
+license:  3587DCX
+3587DCX
+
+license:  3587DCX
+F3587DCX
+
+license:  3587DCX
+best hit:  3587DCX
+Processed  16  rectangles.
+Found  8 rectangles that had at least 7 characters
+correct found!!!!!
+Images/Lateral/3587DCX.jpg
+Images/Lateral/3660CRT.jpg
+best hit:  
+Processed  28  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Lateral/3660CRT.jpg
+Images/Lateral/4674FHC.jpg
+ALG74FHC
+
+A4674FHC
+
+license:  4674FHC
+ALOZLFHC
+
+ALG74FHC
+
+ALGZLFHC
+
+84674FHC
+
+license:  4674FHC
+AL674FHC
+
+A4674FHC
+
+license:  4674FHC
+ALG74FHC
+
+ALG74FHC
+
+best hit:  4674FHC
+Processed  15  rectangles.
+Found  10 rectangles that had at least 7 characters
+correct found!!!!!
+Images/Lateral/4674FHC.jpg
+Images/Lateral/5275HGY.jpg
+best hit:  
+Processed  14  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Lateral/5275HGY.jpg
+Images/Lateral/5789JHB.jpg
+42789 JHB
+
+4789 JHB
+
+789 JHB
+
+WOE JHB
+
+783 JHB 2
+
+789 JHB
+
+WEE JHB
+
+best hit:  
+Processed  27  rectangles.
+Found  7 rectangles that had at least 7 characters
+Images/Lateral/5789JHB.jpg
+Images/Lateral/5796DKP.jpg
+best hit:  
+Processed  29  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Lateral/5796DKP.jpg
+Images/Lateral/6000GVT.jpg
+best hit:  
+Processed  36  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Lateral/6000GVT.jpg
+Images/Lateral/6401JBX.jpg
+best hit:  
+Processed  21  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Lateral/6401JBX.jpg
+Images/Lateral/6554BNX.jpg
+O854BNY
+
+LE554BNY
+
+L8554BNY
+
+license:  8554BNY
+A855 BNY
+
+A855 BNY
+
+LS BNY
+
+2554BNY
+
+license:  2554BNY
+ASSSL BNY
+
+ASSSL BNY
+
+ASSSL BNY
+
+N8554BNY
+
+license:  8554BNY
+A8554BNY
+
+license:  8554BNY
+A855LBNY
+
+AO554BNY
+
+best hit:  8554BNY
+Processed  24  rectangles.
+Found  14 rectangles that had at least 7 characters
+Images/Lateral/6554BNX.jpg
+Images/Lateral/6929LKK.jpg
+best hit:  
+Processed  0  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Lateral/6929LKK.jpg
+Images/Lateral/8727JTC.jpg
+best hit:  
+Processed  11  rectangles.
+Found  0 rectangles that had at least 7 characters
+Images/Lateral/8727JTC.jpg
+processed:  17 /  correct:  3
+License plates incorrectly recognized:  ['0907JRF', '1498JBZ', '1556GMZ', '2344KJP', '3044JMB', '3660CRT', '5275HGY', '5789JHB', '5796DKP', '6000GVT', '6401JBX', '6554BNX', '6929LKK', '8727JTC']
