@@ -3,6 +3,7 @@ import imutils
 import cv2
 import pytesseract
 import os
+import numpy as np
 
 correct_count = 0
 processed_count = 0
@@ -86,6 +87,71 @@ def processLp(img):
 
     return threshInv
 
+def processLpV2(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+# Apply GaussianBlur to reduce noise and improve edge detection
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+
+# Apply Canny edge detection
+    edges = cv2.Canny(blurred, 50, 200)
+
+    contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+# Loop over the contours to find potential license plate candidates
+    license_plate_contour = None
+    for contour in contours:
+        # Approximate the contour
+        epsilon = 0.02 * cv2.arcLength(contour, True)
+        approx = cv2.approxPolyDP(contour, epsilon, True)
+
+        # A license plate is likely to have 4 points (rectangular shape)
+        if len(approx) == 4:
+            # Check for the aspect ratio to ensure it is likely a license plate
+            (x, y, w, h) = cv2.boundingRect(approx)
+            aspect_ratio = w / float(h)
+            if 2 < aspect_ratio < 6:  # Common aspect ratio range for license plates
+                license_plate_contour = approx
+       # Rearrange contour points for perspective transform
+                pts = license_plate_contour.reshape(4, 2)
+    
+                # Get a consistent order of the points (top-left, top-right, bottom-right, bottom-left)
+                rect = np.zeros((4, 2), dtype="float32")
+
+                # Find the top-left and bottom-right points based on the sum of the coordinates
+                s = pts.sum(axis=1)
+                rect[0] = pts[np.argmin(s)]  # top-left
+                rect[2] = pts[np.argmax(s)]  # bottom-right
+
+                # Find the top-right and bottom-left based on the difference
+                diff = np.diff(pts, axis=1)
+                rect[1] = pts[np.argmin(diff)]  # top-right
+                rect[3] = pts[np.argmax(diff)]  # bottom-left
+
+                # Define the dimensions of the new perspective (a rectangle)
+                width_a = np.linalg.norm(rect[2] - rect[3])
+                width_b = np.linalg.norm(rect[1] - rect[0])
+                max_width = max(int(width_a), int(width_b))
+
+                height_a = np.linalg.norm(rect[1] - rect[2])
+                height_b = np.linalg.norm(rect[0] - rect[3])
+                max_height = max(int(height_a), int(height_b))
+
+                # The destination points for the perspective transform (a straight rectangle)
+                dst = np.array([
+                    [0, 0],
+                    [max_width - 1, 0],
+                    [max_width - 1, max_height - 1],
+                    [0, max_height - 1]
+                ], dtype="float32")
+
+                # Apply the perspective transformation matrix
+                M = cv2.getPerspectiveTransform(rect, dst)
+                warped = cv2.warpPerspective(img, M, (max_width, max_height))
+
+                # Show the corrected license plate
+                cv2.imshow('Warped License Plate', warped)
+                cv2.waitKey(0)
 
 
 
@@ -226,13 +292,13 @@ def processImg(imgfile):
 
 dir = 'Images/Frontal'
 
-processAllInFolder(dir)
+# processAllInFolder(dir)
 # processImg('Images/Lateral/3044JMB.jpg')
-# oneImg ='3587DCXlp.jpg' 
-# img = cv2.imread(oneImg)
-# processLp(img)
+oneImg ='3587DCXlp.jpg' 
+img = cv2.imread(oneImg)
+processLpV2(img)
 print('processed: ',processed_count,"/  correct: ",correct_count)
-print("Ratio: ",processed_count / correct_count)
+# print("Ratio: ",processed_count / correct_count)
 
 
 
