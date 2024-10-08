@@ -92,6 +92,12 @@ def processLp(img):
 def processImg(imgfile):
     global correct_count
     global processed_count
+
+    all_rects_count = 0 # that meet the size criteria
+    all_possible_lp_rects_count = 0 # that after text recognition gave at least 7 chars
+
+
+
     lpDict = {}
     img = cv2.imread(imgfile)
     imS = img.copy()
@@ -162,6 +168,7 @@ def processImg(imgfile):
                 aspect_ratio = w / float(h)
                 cv2.rectangle(test, (x,y), (x+w,y+h), (0,255,0),3)
                 if 2.5 < aspect_ratio < 6.0 and w >= min_width and h >= min_height:  # Adjust this range based on the license plate shape
+                    all_rects_count +=1
                     license_plate_contour = cnt
 
                     x, y, w, h = cv2.boundingRect(license_plate_contour)
@@ -175,6 +182,7 @@ def processImg(imgfile):
                     # print("shape: ",license_plateg.shape)
                     lpText = pytesseract.image_to_string(license_plateg, config=options)
                     if lpText and len(lpText) >= 7:
+                        all_possible_lp_rects_count += 1
                         print(lpText)
                         # cv2.imshow('test',license_plate)
                         cv2.waitKey(0)
@@ -197,6 +205,8 @@ def processImg(imgfile):
     processed_count +=1
     best_hit =  getLpText(lpDict)
     print('best hit: ',best_hit)
+    print("Processed ",all_rects_count," rectangles.")
+    print("Found ", all_possible_lp_rects_count, "rectangles that had at least 7 characters")
     correctLP = imgfile.split('/')[-1][:-4]
     
     if best_hit == correctLP:
@@ -222,6 +232,7 @@ processAllInFolder(dir)
 # img = cv2.imread(oneImg)
 # processLp(img)
 print('processed: ',processed_count,"/  correct: ",correct_count)
+print("Ratio: ",processed_count / correct_count)
 
 
 
