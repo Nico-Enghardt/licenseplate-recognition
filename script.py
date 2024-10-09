@@ -207,11 +207,12 @@ def processImg(imgfile):
 
 #do opening to get rid of noise?
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7,7))
-    closingkernel = cv2.getStructuringElement(cv2.MORPH_RECT, (20,15))
+    closingkernel = cv2.getStructuringElement(cv2.MORPH_RECT, (15,10))
+    dilatekernel = cv2.getStructuringElement(cv2.MORPH_RECT, (20,20))
 
-    blurred = cv2.GaussianBlur(gImg, (5,5),0)
+    blurred = cv2.GaussianBlur(gImg, (9,9),2)
 
-    rectKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (150,30))
+    rectKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (450,90))
     
     # blurred = cv2.GaussianBlur(gImg, (3,3),0)
     tophat = cv2.morphologyEx(blurred, cv2.MORPH_TOPHAT, rectKernel)
@@ -222,25 +223,31 @@ def processImg(imgfile):
     blackhat= cv2.morphologyEx(tophat, cv2.MORPH_BLACKHAT, rectKernel)
     # showPic(blackhat,'blackhat')
     
-    threshInv = cv2.threshold(blackhat, 100, 255,
-	cv2.THRESH_BINARY )[1]
+    threshInv = cv2.threshold(blackhat, 130, 255, cv2.THRESH_BINARY )[1]
+    # threshInv = cv2.adaptiveThreshold(blackhat, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+    #                            cv2.THRESH_BINARY, 11, 2)
 
-    #edges = cv2.Canny(blurred,100,150)
+    edges = cv2.Canny(threshInv,150,200)
     # showPic(threshInv)
+    # showPic(edges)
     alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     options = "-c tessedit_char_whitelist={}".format(alphanumeric)
 		# set the PSM mode
     options += " --psm {}".format(7)
 
     for i in range (5):
-        for j in range(3):
+        for j in range(5):
             eroded = cv2.erode(threshInv,kernel,iterations=1+i) #changing those values drasticaly changes output, therefore we can add another iteration if we did not find any good areas
             # showPic(eroded,'eroded')   
-            dilated = cv2.dilate(eroded,kernel,iterations=1+j)
+            dilated = cv2.dilate(eroded,dilatekernel,iterations=1+j)
             # showPic(dilated,'dilated')
 
+            # dilated = cv2.dilate(threshInv,kernel,iterations=1+j)
+            # showPic(dilated,'dilated')
+            # eroded = cv2.erode(dilated,kernel,iterations=1+i) #changing those values drasticaly changes output, therefore we can add another iteration if we did not find any good areas
+            # showPic(eroded,'eroded')   
 
-            closing = cv2.morphologyEx(dilated, cv2.MORPH_CLOSE, closingkernel,iterations=5)
+            closing = cv2.morphologyEx(dilated, cv2.MORPH_CLOSE, closingkernel,iterations=1)
             # showPic(closing,'closing')
             saveImage('closing',imgfile,closing)
 
@@ -366,8 +373,8 @@ def processImg(imgfile):
 dir = 'Images/Lateral'
 
 # processAllInFolder(dir)
-# processImg('Images/Lateral/3044JMB.jpg')
-processImg('Images/Lateral/0907JRF.jpg')
+processImg('Images/Lateral/3044JMB.jpg')
+# processImg('Images/Lateral/3660CRT.jpg')
 # oneImg ='3587DCXlp.jpg' 
 # img = cv2.imread(oneImg)
 # processLpV2(img)
