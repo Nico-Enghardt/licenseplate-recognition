@@ -10,6 +10,7 @@ correct_count = 0
 processed_count = 0
 
 wrong_lp_arr = []
+correct_lp_arr = []
 
 def processAllInFolder(dir):
     for file in os.listdir(dir):
@@ -220,18 +221,18 @@ def processImg(imgfile):
     tophat = cv2.morphologyEx(blurred, cv2.MORPH_TOPHAT, rectKernel)
     # showPic(blurred)  
 
-    showPic(tophat,'tophat')
+    # showPic(tophat,'tophat')
     
     blackhat= cv2.morphologyEx(tophat, cv2.MORPH_BLACKHAT, rectKernel)
-    showPic(blackhat,'blackhat')
+    # showPic(blackhat,'blackhat')
     
     threshInv = cv2.threshold(blackhat, 130, 255, cv2.THRESH_BINARY )[1]
     # threshInv = cv2.adaptiveThreshold(blackhat, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
     #                            cv2.THRESH_BINARY, 11, 2)
 
     edges = cv2.Canny(threshInv,150,200)
-    showPic(threshInv)
-    showPic(edges)
+    # showPic(threshInv)
+    # showPic(edges)
     alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     options = "-c tessedit_char_whitelist={}".format(alphanumeric)
 		# set the PSM mode
@@ -303,11 +304,11 @@ def processImg(imgfile):
                         if lpText and len(lpText) >= 7:
                             all_possible_lp_rects_count += 1
                             print(lpText)
-                            cv2.imshow('test',warped)
-                            cv2.waitKey(0)
+                            # cv2.imshow('test',warped)
+                            # cv2.waitKey(0)
 
                             # cv2.imshow('test',license_plateg)
-                            cv2.waitKey(0)
+                            # cv2.waitKey(0)
                             parsed = parseLpText(lpText)
                             if parsed:
 
@@ -360,6 +361,7 @@ def processImg(imgfile):
     if best_hit == correctLP:
         print('correct found!!!!!')
         correct_count += 1
+        correct_lp_arr.append(correctLP)
     else:
         wrong_lp_arr.append(correctLP)
     print(imgfile)
@@ -385,6 +387,8 @@ processImg('Images/Lateral/1556GMZ.jpg')
 print('processed: ',processed_count,"/  correct: ",correct_count)
 if wrong_lp_arr:
     print("License plates incorrectly recognized: " ,wrong_lp_arr)
+if correct_lp_arr:
+    print("License plates incorrectly recognized: " ,correct_lp_arr)
 # print("Ratio: ",processed_count / correct_count)
 
 
