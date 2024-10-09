@@ -68,6 +68,8 @@ def processLp(img):
 
     rectkernel = cv2.getStructuringElement(cv2.MORPH_RECT, (150,30))
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
+    
+    dilatekernel = cv2.getStructuringElement(cv2.MORPH_RECT, (6,6))
     tophat = cv2.morphologyEx(gImg, cv2.MORPH_TOPHAT, rectkernel)
     # showPic(blurred)  
 
@@ -87,7 +89,7 @@ def processLp(img):
 
     threshInv = cv2.erode(threshInv,kernel,iterations=2)
     # showPic(threshInv)
-    threshInv = cv2.dilate(threshInv,kernel,iterations=2)
+    threshInv = cv2.dilate(threshInv,dilatekernel,iterations=2)
     # showPic(threshInv)
 
     return threshInv
@@ -208,11 +210,11 @@ def processImg(imgfile):
 #do opening to get rid of noise?
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7,7))
     closingkernel = cv2.getStructuringElement(cv2.MORPH_RECT, (15,10))
-    dilatekernel = cv2.getStructuringElement(cv2.MORPH_RECT, (30,30))
+    dilatekernel = cv2.getStructuringElement(cv2.MORPH_RECT, (20,20))
 
     blurred = cv2.GaussianBlur(gImg, (9,9),2)
 
-    rectKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (150,60)) ## changing this one looks like chanigng a lot
+    rectKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (150,30)) ## changing this one looks like chanigng a lot
     
     # blurred = cv2.GaussianBlur(gImg, (3,3),0)
     tophat = cv2.morphologyEx(blurred, cv2.MORPH_TOPHAT, rectKernel)
@@ -223,7 +225,7 @@ def processImg(imgfile):
     blackhat= cv2.morphologyEx(tophat, cv2.MORPH_BLACKHAT, rectKernel)
     showPic(blackhat,'blackhat')
     
-    threshInv = cv2.threshold(blackhat, 140, 255, cv2.THRESH_BINARY )[1]
+    threshInv = cv2.threshold(blackhat, 130, 255, cv2.THRESH_BINARY )[1]
     # threshInv = cv2.adaptiveThreshold(blackhat, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
     #                            cv2.THRESH_BINARY, 11, 2)
 
@@ -375,7 +377,7 @@ def processImg(imgfile):
 dir = 'Images/Lateral'
 
 # processAllInFolder(dir)
-processImg('Images/Lateral/3044JMB.jpg')
+processImg('Images/Lateral/1556GMZ.jpg')
 # processImg('Images/Lateral/3660CRT.jpg')
 # oneImg ='3587DCXlp.jpg' 
 # img = cv2.imread(oneImg)
