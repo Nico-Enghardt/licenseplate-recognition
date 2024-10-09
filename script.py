@@ -208,11 +208,11 @@ def processImg(imgfile):
 #do opening to get rid of noise?
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7,7))
     closingkernel = cv2.getStructuringElement(cv2.MORPH_RECT, (15,10))
-    dilatekernel = cv2.getStructuringElement(cv2.MORPH_RECT, (20,20))
+    dilatekernel = cv2.getStructuringElement(cv2.MORPH_RECT, (30,30))
 
     blurred = cv2.GaussianBlur(gImg, (9,9),2)
 
-    rectKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (450,90))
+    rectKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (150,30))
     
     # blurred = cv2.GaussianBlur(gImg, (3,3),0)
     tophat = cv2.morphologyEx(blurred, cv2.MORPH_TOPHAT, rectKernel)
@@ -223,7 +223,7 @@ def processImg(imgfile):
     blackhat= cv2.morphologyEx(tophat, cv2.MORPH_BLACKHAT, rectKernel)
     # showPic(blackhat,'blackhat')
     
-    threshInv = cv2.threshold(blackhat, 130, 255, cv2.THRESH_BINARY )[1]
+    threshInv = cv2.threshold(blackhat, 120, 255, cv2.THRESH_BINARY )[1]
     # threshInv = cv2.adaptiveThreshold(blackhat, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
     #                            cv2.THRESH_BINARY, 11, 2)
 
@@ -235,16 +235,16 @@ def processImg(imgfile):
 		# set the PSM mode
     options += " --psm {}".format(7)
 
-    for i in range (5):
-        for j in range(5):
-            eroded = cv2.erode(threshInv,kernel,iterations=1+i) #changing those values drasticaly changes output, therefore we can add another iteration if we did not find any good areas
-            # showPic(eroded,'eroded')   
-            dilated = cv2.dilate(eroded,dilatekernel,iterations=1+j)
-            # showPic(dilated,'dilated')
+    for i in range (3):
+        for j in range(3):
+            # eroded = cv2.erode(threshInv,kernel,iterations=1+i) #changing those values drasticaly changes output, therefore we can add another iteration if we did not find any good areas
+            # # showPic(eroded,'eroded')   
+            # dilated = cv2.dilate(eroded,dilatekernel,iterations=1+j)
+            # # showPic(dilated,'dilated')
 
-            # dilated = cv2.dilate(threshInv,kernel,iterations=1+j)
+            dilated = cv2.dilate(threshInv,dilatekernel,iterations=2+j)
             # showPic(dilated,'dilated')
-            # eroded = cv2.erode(dilated,kernel,iterations=1+i) #changing those values drasticaly changes output, therefore we can add another iteration if we did not find any good areas
+            eroded = cv2.erode(dilated,kernel,iterations=1+i) #changing those values drasticaly changes output, therefore we can add another iteration if we did not find any good areas
             # showPic(eroded,'eroded')   
 
             closing = cv2.morphologyEx(dilated, cv2.MORPH_CLOSE, closingkernel,iterations=1)
@@ -271,7 +271,7 @@ def processImg(imgfile):
                 x, y, w, h = cv2.boundingRect(cnt)
                 aspect_ratio = w / float(h)
                 cv2.rectangle(test, (x,y), (x+w,y+h), (0,255,0),3)
-                if 2.5 < aspect_ratio < 6.0 and w >= min_width and h >= min_height:  # Adjust this range based on the license plate shape
+                if 2.0 < aspect_ratio < 6.0 and w >= min_width and h >= min_height:  # Adjust this range based on the license plate shape
                     all_rects_count +=1
                     license_plate_contour = cnt
 
@@ -373,7 +373,7 @@ def processImg(imgfile):
 dir = 'Images/Lateral'
 
 # processAllInFolder(dir)
-processImg('Images/Lateral/3044JMB.jpg')
+processImg('Images/Lateral/0907JRF.jpg')
 # processImg('Images/Lateral/3660CRT.jpg')
 # oneImg ='3587DCXlp.jpg' 
 # img = cv2.imread(oneImg)
