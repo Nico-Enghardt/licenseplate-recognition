@@ -223,7 +223,7 @@ def processImg(imgfile):
     blackhat= cv2.morphologyEx(tophat, cv2.MORPH_BLACKHAT, rectKernel)
     showPic(blackhat,'blackhat')
     
-    threshInv = cv2.threshold(blackhat, 120, 255, cv2.THRESH_BINARY )[1]
+    threshInv = cv2.threshold(blackhat, 140, 255, cv2.THRESH_BINARY )[1]
     # threshInv = cv2.adaptiveThreshold(blackhat, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
     #                            cv2.THRESH_BINARY, 11, 2)
 
@@ -243,9 +243,9 @@ def processImg(imgfile):
             # showPic(dilated,'dilated')
 
             dilated = cv2.dilate(threshInv,dilatekernel,iterations=1+j)
-            showPic(dilated,'dilated')
+            # showPic(dilated,'dilated')
             eroded = cv2.erode(dilated,kernel,iterations=1+i) #changing those values drasticaly changes output, therefore we can add another iteration if we did not find any good areas
-            showPic(eroded,'eroded')   
+            # showPic(eroded,'eroded')   
 
             closing = cv2.morphologyEx(dilated, cv2.MORPH_CLOSE, closingkernel,iterations=1)
             # showPic(closing,'closing')
@@ -301,7 +301,7 @@ def processImg(imgfile):
                         if lpText and len(lpText) >= 7:
                             all_possible_lp_rects_count += 1
                             print(lpText)
-                            # cv2.imshow('test',license_plate)
+                            cv2.imshow('test',warped)
                             cv2.waitKey(0)
 
                             # cv2.imshow('test',license_plateg)
@@ -332,9 +332,9 @@ def processImg(imgfile):
                         all_possible_lp_rects_count += 1
                         print(lpText)
                         # cv2.imshow('test',license_plate)
-                        cv2.waitKey(0)
+                        # cv2.waitKey(0)
 
-                        # cv2.imshow('test',license_plateg)
+                        cv2.imshow('test',license_plateg)
                         cv2.waitKey(0)
                         parsed = parseLpText(lpText)
                         if parsed:
