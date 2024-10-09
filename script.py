@@ -35,6 +35,8 @@ def showPic(img,title="Image"):
 def parseLpText(text):
     # find index where there is a number and letter, then get 4 letters before and 3 chars after,
     # because sometimes ocr recognises "E" sign at the beggining as different characters
+
+    text = text.replace(" ","")
     for i in range(4,len(text)):
             if i>=4 and len(text)-i >= 3:
                 if text[i-1].isdigit() and text[i].isalpha():
@@ -83,9 +85,9 @@ def processLp(img):
     
 
 
-    threshInv = cv2.erode(threshInv,kernel,iterations=1)
+    threshInv = cv2.erode(threshInv,kernel,iterations=2)
     # showPic(threshInv)
-    threshInv = cv2.dilate(threshInv,kernel,iterations=1)
+    threshInv = cv2.dilate(threshInv,kernel,iterations=2)
     # showPic(threshInv)
 
     return threshInv
@@ -157,7 +159,7 @@ def straighten_lp(image):
     imgCanny = cv2.Canny(imgBlur,150,200)
     # imgErode1 = cv2.erode(imgCanny, first_erode_kernel, iterations=1)
     imgDial = cv2.dilate(imgCanny,kernel,iterations=2)
-    imgThres = cv2.erode(imgDial,kernel,iterations=2)
+    imgThres = cv2.erode(imgDial,kernel,iterations=1)
     biggest, imgContour, warped = getContours(imgThres, image)  # Change
 
     titles = ['Original', 'Blur', 'Canny', 'Dilate', 'Threshold', 'Contours', 'Warped']  # Change - also show warped image
@@ -207,11 +209,11 @@ def processImg(imgfile):
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7,7))
     closingkernel = cv2.getStructuringElement(cv2.MORPH_RECT, (20,15))
 
-    #blurred = cv2.GaussianBlur(gImg, (5,5),0)
+    blurred = cv2.GaussianBlur(gImg, (5,5),0)
 
     rectKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (150,30))
     
-    blurred = cv2.GaussianBlur(gImg, (3,3),0)
+    # blurred = cv2.GaussianBlur(gImg, (3,3),0)
     tophat = cv2.morphologyEx(blurred, cv2.MORPH_TOPHAT, rectKernel)
     # showPic(blurred)  
 
@@ -231,7 +233,7 @@ def processImg(imgfile):
     options += " --psm {}".format(7)
 
     for i in range (5):
-        for j in range(5):
+        for j in range(3):
             eroded = cv2.erode(threshInv,kernel,iterations=1+i) #changing those values drasticaly changes output, therefore we can add another iteration if we did not find any good areas
             # showPic(eroded,'eroded')   
             dilated = cv2.dilate(eroded,kernel,iterations=1+j)
@@ -270,16 +272,37 @@ def processImg(imgfile):
                     # print(w,h)
                     # license_plate = imS[y:y+h+10, x:x+w+10]
                     # license_plateg = processLp(license_plate)
-                    if x >= 50 and y >= 50:
+                    tmp = 50
+                    if x >= tmp and y >= tmp:
 
-                        license_plate = imS[y-50:y+h+50, x-50:x+w+50]
+                        license_plate = imS[y-tmp:y+h+tmp, x-tmp:x+w+tmp]
+
+                        cv2.rectangle(img, (x-tmp,y-tmp), (x+w+tmp,y+h+tmp), (0,255,0),3)
                     else:
-                        license_plate = imS[y:y+h+50, x:x+w+50]
+                        license_plate = imS[y:y+h+tmp, x:x+w+tmp]
+                        cv2.rectangle(img, (x,y), (x+w,y+h), (0,255,0),3)
                     warped, titles, images = straighten_lp(license_plate)
 
                     if warped is not None:
-                        license_plate = warped
-                        show_all_images(titles,images)
+                        warped = processLp(warped)
+                        try:
+                            lpText = pytesseract.image_to_string(warped, config=options)
+                        except:
+                            print("Tesseract error")
+                        if lpText and len(lpText) >= 7:
+                            all_possible_lp_rects_count += 1
+                            print(lpText)
+                            # cv2.imshow('test',license_plate)
+                            cv2.waitKey(0)
+
+                            # cv2.imshow('test',license_plateg)
+                            cv2.waitKey(0)
+                            parsed = parseLpText(lpText)
+                            if parsed:
+
+                                # showPic(license_plateg)
+                                lpDict[parsed] = lpDict.get(parsed, 0)+1
+                        # show_all_images(titles,images)
                     # print("iteration ",i,j)
                     # convert it to gray scale
                     license_plate = cv2.cvtColor(license_plate, cv2.COLOR_BGR2GRAY)
@@ -292,7 +315,10 @@ def processImg(imgfile):
                     
                     # showPic(license_plateg)
                     # print("shape: ",license_plateg.shape)
-                    lpText = pytesseract.image_to_string(license_plateg, config=options)
+                    try:
+                        lpText = pytesseract.image_to_string(license_plateg, config=options)
+                    except:
+                        print("Tesseract error")
                     if lpText and len(lpText) >= 7:
                         all_possible_lp_rects_count += 1
                         print(lpText)
@@ -308,7 +334,6 @@ def processImg(imgfile):
                             lpDict[parsed] = lpDict.get(parsed, 0)+1
                     ## TODO: Once we hace the rectangle of an image, we need to do a Character recognision, to check if there are 4 nums and 3 chars
                     ## Also, we can check if there is a small tall rectangle
-                    cv2.rectangle(img, (x,y), (x+w,y+h), (0,255,0),3)
                     # cv2.imshow("Image",imS)
                     # cv2.waitKey(0)
                     # cv2.imshow("Image",edges)
