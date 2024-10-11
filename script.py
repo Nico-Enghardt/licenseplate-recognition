@@ -35,7 +35,16 @@ def getLpText(d):
             maxc = d[key]
     return text
 
-def processImg(imgfile, filename, template):
+def load_templates(template_dir):
+    templates = []
+    for filename in os.listdir(template_dir):
+        template_path = os.path.join(template_dir, filename)
+        template = cv2.imread(template_path)
+        if template is not None:
+            templates.append(template)
+    return templates
+
+def processImg(imgfile, filename, templates):
     global correct_plates, total_images
 
     lpDict = {}
@@ -43,12 +52,12 @@ def processImg(imgfile, filename, template):
     imS = imgfile.copy()
 
     gray_img = cv2.cvtColor(imS, cv2.COLOR_BGR2GRAY)
-    template_gray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
-    
 
-    result = cv2.matchTemplate(gray_img, template_gray, cv2.TM_CCOEFF_NORMED)
-    threshold = 0.5  
-    locations = np.where(result >= threshold)
+    for template in templates:
+        template_gray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+        result = cv2.matchTemplate(gray_img, template_gray, cv2.TM_CCOEFF_NORMED)
+        threshold = 0.5  
+        locations = np.where(result >= threshold)
 
     for pt in zip(*locations[::-1]):
         x, y = pt
@@ -80,12 +89,13 @@ def display_accuracy():
         accuracy = (correct_plates / total_images) * 100
         print(f"Accuracy: {accuracy:.2f}% ({correct_plates}/{total_images})")
 
-template = cv2.imread('template.jpg')  
+template_dir = 'template_images' 
+templates = load_templates(template_dir)
 
 lab, img = get_images()
 
 for image, filename in img:
-    processImg(image, filename, template)
+    processImg(image, filename, templates)
 
 display_accuracy()
 cv2.destroyAllWindows()

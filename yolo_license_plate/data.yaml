@@ -1,0 +1,5 @@
+train: C:/Users/bogda/yolo_license_plate/dataset/images
+val: C:/Users/bogda/yolo_license_plate/dataset/images
+
+nc: 1 
+names: ['license_plate']  # The name of the class
