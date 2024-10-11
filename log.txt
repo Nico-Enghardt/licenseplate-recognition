@@ -1,0 +1,46 @@
+23 of 63 are correct, 36.507937 %
+Average time: 20.645118236541748
+
+[('0225JWL', 'nothing recognized so far'),
+('0425KDK', 'nothing recognized so far'),
+('0425KDK', 'nothing recognized so far'),
+('0649DHS', '0649DSH'),
+('1072FRD', '1072FRO'),
+('1414LJY', 'nothing recognized so far'),
+('2202LNW', 'nothing recognized so far'),
+('2841LJX', 'nothing recognized so far')]
+
+15 of 32 are correct, 46.875000 %
+Average time: 6.755988597869873
+Incorrectly detected labels: [('5275HGY', '9275HOY'),
+('0907JRF', 'nothing recognized so far'),
+('3587DCX', '3987DCX'),
+('3660CRT', 'nothing recognized so far'),
+('5796DKP', '5796OKP'),
+('1498JBZ', 'nothing recognized so far'),
+('5789JHB', 'nothing recognized so far'),
+('6554BNX', '8554BNY'),
+('8727JTC', 'nothing recognized so far'),
+('6401JBX', 'nothing recognized so far'),
+('1556GMZ', 'nothing recognized so far'),
+('5275HGY', '5272HGY'),
+('7153JWD', 'nothing recognized so far'),
+('8727JTC', 'nothing recognized so far'),
+('9892JFR', '9892CFR'),
+('3340JMF', 'nothing recognized so far'),
+('9247CZG', 'nothing recognized so far')]
+
+on before not recognized license plates:
+
+1 of 11 are correct, 9.090909 %
+Average time: 8.733675003051758
+Incorrectly detected labels: [('9247CZG', 'nothing recognized so far'),
+('3340JMF', '3340SMF'),
+('8727JTC', 'nothing recognized so far'),
+('6401JBX', 'nothing recognized so far'),
+('0907JRF', 'nothing recognized so far'),
+('1556GMZ', 'nothing recognized so far'),
+('1498JBZ', 'nothing recognized so far'),
+('5789JHB', '2789JHB'),
+('3660CRT', 'nothing recognized so far'),
+('8727JTC', 'nothing recognized so far')]
