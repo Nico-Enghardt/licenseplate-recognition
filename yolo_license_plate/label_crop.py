@@ -40,7 +40,8 @@ def processLp(img):
 
     rectkernel = cv2.getStructuringElement(cv2.MORPH_RECT, (150,30))
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
-    imgBlur = cv2.GaussianBlur(gImg,(7,7),2)
+    #imgBlur = cv2.GaussianBlur(gImg,(7,7),2)
+    #showPic(imgBlur)
     dilatekernel = cv2.getStructuringElement(cv2.MORPH_RECT, (6,6))
     #tophat = cv2.morphologyEx(gImg, cv2.MORPH_TOPHAT, rectkernel)
     # showPic(blurred)  
@@ -51,15 +52,15 @@ def processLp(img):
     # showPic(blackhat,'blackhat')
 
     
-    threshInv = cv2.threshold(imgBlur, 100, 255,
+    threshInv = cv2.threshold(gImg, 100, 255,
 	cv2.THRESH_BINARY)[1]
 
     #edges = cv2.Canny(blurred,100,150)
     #showPic(threshInv)
     
-    threshInv = cv2.erode(threshInv,kernel,iterations=1)
+    threshInv = cv2.erode(threshInv,kernel,iterations=2)
     #showPic(threshInv)
-    threshInv = cv2.dilate(threshInv,kernel,iterations=2)
+    #threshInv = cv2.dilate(threshInv,kernel,iterations=2)
     #showPic(threshInv)
 
     return threshInv
@@ -193,10 +194,8 @@ for image_path in image_folder.glob('*.jpg'):  # Adjust file extension as needed
                # license_plate = image[y_min-tmp:y_max+tmp, x_min-tmp:x_max+tmp]
             #else:
             license_plate = image[y_min:y_max, x_min:x_max]
-
             crop_image_path = output_crop_folder / f"{image_path.stem}_crop_{index}.jpg"
             cv2.imwrite(str(crop_image_path), license_plate)
-
             warped, titles, images = straighten_lp(license_plate)
 
             alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -253,6 +252,7 @@ for image_path in image_folder.glob('*.jpg'):  # Adjust file extension as needed
                     # showPic(license_plateg)
                     lpDict[parsed] = lpDict.get(parsed, 0)+1
             # Save the cropped image
+            
             
             # OCR: Use Tesseract to extract text from the cropped image
             #lpText = pytesseract.image_to_string(license_plate, config=options)
