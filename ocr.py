@@ -71,7 +71,7 @@ for t, image_path in enumerate(image_folder.glob('*.jp*g')):  # Adjust file exte
         recognized_text = parseLpText(lpText)
         print('Recognized text: ',recognized_text)
 
-        correctLP = image_path.stem.split()[0]
+        correctLP = image_path.stem[:7]
         print(correctLP)
         
         if recognized_text == correctLP:
