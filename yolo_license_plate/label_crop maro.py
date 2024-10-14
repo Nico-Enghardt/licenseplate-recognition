@@ -3,6 +3,10 @@ import pandas as pd
 from pathlib import Path
 import pytesseract
 import numpy as np
+from fuzzywuzzy import fuzz
+import easyocr
+from paddleocr import PaddleOCR 
+
 
 def showPic(img, title="Image", width=800, height=600):
     #img = cv2.resize(img, (width, height))
@@ -12,7 +16,7 @@ def showPic(img, title="Image", width=800, height=600):
     cv2.destroyAllWindows()
 
 def parseLpText(text):
-    text = text.replace(""," ")
+    text = text.replace(" ","")
     for i in range(4, len(text)):
         if i >= 4 and len(text) - i >= 3:
             if text[i - 1].isdigit() and text[i].isalpha():
@@ -33,21 +37,28 @@ def getLpText(d):
 
 def getLPfromFileName(fp):
     fp = fp.split('/')
+    
+def median_brightness(img, percentile = 50):
+    pixels = img.flatten()
+    sorted = np.sort(pixels)
+    
+    return sorted[int(np.floor(percentile/100*len(sorted)))]
 
-def processLp(img):
+def processLp(img, thresh_perc=50):
 
     gImg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
     blurred = cv2.GaussianBlur(gImg,(9,9),2)
-    dilatekernel = cv2.getStructuringElement(cv2.MORPH_RECT, (6,6))
-    threshInv = cv2.threshold(blurred, 100, 255,
-	cv2.THRESH_BINARY)[1] # we may want to try with otsu later?
+    
+    threshold = median_brightness(img, percentile=thresh_perc)
+    
+    threshInv = cv2.threshold(blurred, threshold, 255, cv2.THRESH_BINARY)[1] # we may want to try with otsu later?
 
-    threshInv = cv2.erode(threshInv,kernel,iterations=2)
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
+    threshInv = cv2.erode(threshInv,kernel,iterations=1)
     #showPic(threshInv)
     threshInv = cv2.dilate(threshInv,kernel,iterations=1)
-    #showPic(threshInv)
+    # showPic(threshInv)
 
     return threshInv
 
@@ -101,11 +112,9 @@ def getContours(img, orig, ):  # Change - pass the original image too
 
         # Warp the image
         img_shape = (width, height)
-        warped = cv2.warpPerspective(orig, M, img_shape, flags=cv2.INTER_LINEAR)
+        warped = cv2.warpPerspective(img, M, img_shape, flags=cv2.INTER_LINEAR)
 
     return biggest, imgContour, warped  # Change - also return drawn image
-
-
 
 def straighten_lp(image):
     kernel = np.ones((15,10))
@@ -127,15 +136,28 @@ def straighten_lp(image):
     return warped, titles, images
 
 # Define the directory paths
-image_folder = Path('C:/Users/bogda/licenseplate-recognition/yolo_license_plate/dataset/images/validate')  # Folder containing the images
-label_folder = Path('C:/Users/bogda/licenseplate-recognition/yolov5/runs/detect/test_output5/labels')  # Folder containing the labels
-output_crop_folder = Path('C:/Users/bogda/licenseplate-recognition/yolov5/runs/detect/crops')
+image_folder = Path('yolo_license_plate/dataset/images/validate')  # Folder containing the images
+label_folder = Path('yolo_license_plate/yolov5/runs/detect/test_output7/labels')  # Folder containing the labels
+output_crop_folder = Path('yolo_license_plate/yolov5/runs/detect/crops')
 
 # Ensure the output directory for cropped images exists
 output_crop_folder.mkdir(parents=True, exist_ok=True)
 
 # Define a scaling factor to reduce the size of the crop (e.g., 0.8 for 80% size)
 crop_scale = 1.3
+
+alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+options = "-c tessedit_char_whitelist={}".format(alphanumeric)
+    # set the PSM mode
+options += " --psm {}".format(11)
+
+# Set EasyOcr options
+# reader = easyocr.Reader(['en']) # specify the language
+
+paddle_ocr = PaddleOCR(use_angle_cls=True, lang='en')
+
+correct_count = 0
+scores = []
 
 # Iterate over all images in the image folder
 for image_path in image_folder.glob('*.jpg'):  # Adjust file extension as needed (e.g., .png)
@@ -175,90 +197,25 @@ for image_path in image_folder.glob('*.jpg'):  # Adjust file extension as needed
             y_min = max(0, y_min)
             x_max = min(w, x_max)
             y_max = min(h, y_max)
-        
-            #if x_min >= tmp and y_min >= tmp:
 
-               # license_plate = image[y_min-tmp:y_max+tmp, x_min-tmp:x_max+tmp]
-            #else:
+
             license_plate = image[y_min:y_max, x_min:x_max]
 
             crop_image_path = output_crop_folder / f"{image_path.stem}_crop_{index}.jpg"
             cv2.imwrite(str(crop_image_path), license_plate)
-
-            warped, titles, images = straighten_lp(license_plate)
-            alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-            options = "-c tessedit_char_whitelist={}".format(alphanumeric)
-                # set the PSM mode
-            options += " --psm {}".format(7)
-
-            if warped is not None:
-                warped = processLp(warped)
-                print('processing warped')
-                showPic(warped)
-                try:
-                    lpText = pytesseract.image_to_string(warped, config=options)
-                except:
-                    print("Tesseract error")
-                if lpText and len(lpText) >= 7:
-                    print(lpText)
-                    # cv2.imshow('test',warped)
-                    # cv2.waitKey(0)
-
-                    # cv2.imshow('test',license_plateg)
-                    # cv2.waitKey(0)
-                    parsed = parseLpText(lpText)
-                    if parsed:
-
-                        # showPic(license_plateg)
-                        lpDict[parsed] = lpDict.get(parsed, 0)+1
-                # show_all_images(titles,images)
-            # print("iteration ",i,j)
-            # convert it to gray scale
-            # license_plate = cv2.cvtColor(license_plate, cv2.COLOR_BGR2GRAY)
-            # blurr a bit
-            license_plateg = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            license_plate1 = cv2.GaussianBlur(license_plateg,(7,7),2)
-            license_plate1 = cv2.threshold(license_plate1, 100, 255,cv2.THRESH_BINARY )[1]
-
-            showPic(license_plate1)
-
-            # showPic(license_plateg)
-            # print("shape: ",license_plateg.shape)
+                
+            lpText = ""
+            try:
+                lpText = "".join(k[1][0] for k in paddle_ocr.ocr(license_plate)[0])
+                #lpText =  "".join([text for _,text,_ in reader.readtext(proccessed_lp)])
+                #lpText = pytesseract.image_to_string(proccessed_lp, config=options)
             
-            license_plate2 = processLp(license_plateg)
-            try:
-                lpText = pytesseract.image_to_string(license_plate2, config=options)
-                if lpText and len(lpText) >= 7:
-                    print(lpText)
-                    # cv2.imshow('test',license_plate)
-                    # cv2.waitKey(0)
-
-                    # cv2.imshow('test',license_plateg)
-                    # cv2.waitKey(0)
-                    parsed = parseLpText(lpText)
-                    if parsed:
-
-                        # showPic(license_plateg)
-                        lpDict[parsed] = lpDict.get(parsed, 0)+1
-            except:
-                print("Tesseract error")
-
-            try:
-                lpText = pytesseract.image_to_string(license_plate1, config=options)
-                if lpText and len(lpText) >= 7:
-                    print(lpText)
-                    # cv2.imshow('test',license_plate)
-                    # cv2.waitKey(0)
-
-                    # cv2.imshow('test',license_plateg)
-                    # cv2.waitKey(0)
-                    parsed = parseLpText(lpText)
-                    if parsed:
-
-                        # showPic(license_plateg)
-                        lpdict[parsed] = lpdict.get(parsed, 0)+1
-            except:
-                print("Tesseract error")
+            except Exception as err: 
+                print("Tesseract error:", err)
+            parsed = parseLpText(lpText)
+            if parsed:
+                # showPic(license_plateg)
+                lpDict[parsed] = lpDict.get(parsed, 0)+1
 
             best_hit =  getLpText(lpDict)
             print('best hit: ',best_hit)
@@ -266,14 +223,26 @@ for image_path in image_folder.glob('*.jpg'):  # Adjust file extension as needed
             correctLP = image_path.stem 
             if best_hit == correctLP:
                 print('correct found!!!!!')
-            #     correct_count += 1
-            #     correct_lp_arr.append(correctLP)
-            # else:
-            #     wrong_lp_arr.append(correctLP)
+                correct_count += 1
+
+                eval_image_path = output_crop_folder / f"../eval/{image_path.stem}_correct_pad_{index}.jpg"
+                cv2.imwrite(str(eval_image_path), license_plate)
+
+            
+            elif len(lpDict) == 0:
+                eval_image_path = output_crop_folder / f"../eval/{image_path.stem}_nodetection_{index}.jpg"
+                cv2.imwrite(str(eval_image_path), license_plate)
                 
-                    #if lpText and len(lpText) >= 7:
-                        #parsed = parseLpText(lpText)
-                        #if parsed:
-                            #lpDict[parsed] = lpDict.get(parsed, 0) + 1
-    recognized_plate = getLpText(lpDict)
-    print('best hit: ', recognized_plate)
+            else: 
+                score = fuzz.ratio(best_hit, correctLP)
+                scores += [score]
+                print(f"Could achieve score of {score}")
+                
+                eval_image_path = output_crop_folder / f"../eval/{image_path.stem}_{score}%_pad_{index}.jpg"
+                cv2.imwrite(str(eval_image_path), license_plate)
+                
+
+print('correct count: ',correct_count)
+print('Average score:', np.mean(scores))
+print('Median score:', np.median(scores))
+                

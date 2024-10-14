@@ -5,14 +5,14 @@ import subprocess
 yolov5_path = 'yolov5'  # Now it is relative since it's in the same folder as the script
 
 # Change to the YOLOv5 directory
-os.chdir(yolov5_path)
+os.chdir("yolo_license_plate/yolov5")
 
 # Define paths for the dataset and YAML file
 data_yaml = '../data.yaml'  # Relative path to the YAML file since it's one level up
-weights = 'yolov5s.pt'  # Pre-trained weights file, which can be automatically downloaded
+weights = 'runs/train/license_plate_model3/weights/best.pt'  # Pre-trained weights file, which can be automatically downloaded
 
 # Number of epochs and image size (adjust based on your dataset and hardware)
-epochs = 100
+epochs = 50
 img_size = 640
 batch_size = 16
 
