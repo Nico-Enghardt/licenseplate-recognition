@@ -1,0 +1,5 @@
+train: dataset/images/train
+val: dataset/images/validate
+
+nc: 1 
+names: ['license_plate']  # The name of the class
