@@ -134,8 +134,14 @@ def straighten_lp(image):
     return warped, titles, images
 
 # Define the directory paths
+# Validation Set ----
 image_folder = Path('yolo_license_plate/dataset/images/validate')  # Folder containing the images
 label_folder = Path('yolo_license_plate/yolov5/runs/detect/test_output9/labels')  # Folder containing the labels
+
+# Easy Set (Tutor-given images)
+image_folder = Path('yolo_license_plate/dataset/images/easy')  # Folder containing the images
+label_folder = Path('yolo_license_plate/yolov5/runs/detect/test_output10/labels')  # Folder containing the labels
+
 output_eval_folder = Path('yolo_license_plate/results')
 
 # Ensure the output directory for cropped images exists
@@ -158,11 +164,11 @@ scores = []
 evals = []
 
 # Iterate over all images in the image folder
-for image_path in image_folder.glob('*.jpg'):  # Adjust file extension as needed (e.g., .png)
+for t, image_path in enumerate(image_folder.glob('*.jp*g')):  # Adjust file extension as needed (e.g., .png)
     # Generate the corresponding label file path
     label_path = label_folder / f"{image_path.stem}.txt"  # Match the label to the image by name
 
-    print('processing: ', image_path)
+    print(f'processing Img. Nr {t}', image_path)
 
     # Check if the label file exists
     if label_path.is_file():

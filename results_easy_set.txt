@@ -1,0 +1,5 @@
+[100, 100, 100, 100, 100, 100, 100, 0, 100, 0, 100, 74, 100, 100, 74, 0, 74, 100, 100, 100, 74, 100, 100, 100, 100, 100, 100, 100, 74, 100, 100, 100]['perfect', 'perfect', 'perfect', 'perfect', 'perfect', 'perfect', 'perfect', 'ocr_failure', 'perfect', 'ocr_failure', 'perfect', 'partial match', 'perfect', 'perfect', 'partial match', 'ocr_failure', 'partial match', 'perfect', 'perfect', 'perfect', 'partial match', 'perfect', 'perfect', 'perfect', 'perfect', 'perfect', 'perfect', 'perfect', 'partial match', 'perfect', 'perfect', 'perfect']
+
+Average score: 86.5625
+Median score: 100.0
+correct count: 0

@@ -11,7 +11,7 @@ os.chdir('yolo_license_plate/yolov5')
 # Define paths for the trained model weights and the image you want to test
 weights_path = 'runs/train/license_plate_model4/weights/best.pt'  # Path to your trained model weights
 #weights_path = 'yolov5s.pt'  # Path to your trained model weights
-image_path = '../dataset/images/validate'  # Replace with the path to the image you want to test
+image_path = '../dataset/images/easy'  # Replace with the path to the image you want to test
 
 # Output folder for cropped images
 output_crop_folder = 'runs/detect/test_output/crops'
