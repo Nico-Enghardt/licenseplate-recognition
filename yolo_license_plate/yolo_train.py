@@ -2,14 +2,13 @@ import os
 import subprocess
 
 # Define the path to your YOLOv5 directory
-yolov5_path = 'yolov5'  # Now it is relative since it's in the same folder as the script
+yolov5_path = 'yolo_license_plate/yolov5'  # Now it is relative since it's in the same folder as the script
 
-# Change to the YOLOv5 directory
-os.chdir("yolo_license_plate/yolov5")
+
 
 # Define paths for the dataset and YAML file
-data_yaml = '../data.yaml'  # Relative path to the YAML file since it's one level up
-weights = 'runs/train/license_plate_model3/weights/best.pt'  # Pre-trained weights file, which can be automatically downloaded
+data_yaml = 'data.yaml'  # Relative path to the YAML file since it's one level up
+weights = 'runs/train/license_plate_model4/weights/best.pt'  # Pre-trained weights file, which can be automatically downloaded
 
 # Number of epochs and image size (adjust based on your dataset and hardware)
 epochs = 100
@@ -18,7 +17,7 @@ batch_size = 16
 
 # Construct the command as a list
 command = [
-    "python", "train.py",
+    "python", f"{yolov5_path}/train.py",
     "--img", str(img_size),
     "--batch", str(batch_size),
     "--epochs", str(epochs),
@@ -31,3 +30,6 @@ command = [
 
 # Run the command
 subprocess.run(command)
+
+
+# once we detected images, we need to crop them and save them to a file

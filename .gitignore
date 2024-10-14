@@ -2,3 +2,7 @@ venv/
 test/
 .venv/
 __pycache__/
+*/yolov5
+yolo_license_plate/runs/detect
+results.txt
+results/
