@@ -13,7 +13,7 @@ if str(ROOT) not in path:
 ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 # Define the directory paths
 
-image_folder = Path(f'{ROOT}/yolo_license_plate/runs/detect/test_output8/crops/license_plate')  # Folder containing the images
+image_folder = Path(f'{ROOT}/runs/detect/test_output8/crops/license_plate')  # Folder containing the images
 output_eval_folder = Path(f'{ROOT}/results') # Folder where you want to save images with information about their correct text ratio
 
 

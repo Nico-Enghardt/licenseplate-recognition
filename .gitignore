@@ -3,9 +3,9 @@ test/
 .venv/
 __pycache__/
 */yolov5
-yolo_license_plate/runs/detect
+yolo/runs/detect
 */results.txt
-yolo_license_plate/results/
+yolo/results/
 results/
 results.txt
 
