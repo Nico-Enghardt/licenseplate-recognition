@@ -3,7 +3,27 @@ from pathlib import Path
 import numpy as np
 from fuzzywuzzy import fuzz
 from paddleocr import PaddleOCR 
+import os
+from sys import path
 
+FILE = Path(__file__).resolve()
+ROOT = FILE.parents[0]  # YOLOv5 root directory
+if str(ROOT) not in path:
+    path.append(str(ROOT))  # add ROOT to PATH
+ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
+# Define the directory paths
+
+image_folder = Path(f'{ROOT}/yolo_license_plate/runs/detect/test_output8/crops/license_plate')  # Folder containing the images
+output_eval_folder = Path(f'{ROOT}/results') # Folder where you want to save images with information about their correct text ratio
+
+
+# Ensure the output directory for cropped images exists
+output_eval_folder.mkdir(parents=True, exist_ok=True)
+
+paddle_ocr = PaddleOCR(use_angle_cls=True, lang='en')
+
+scores = []
+evals = []
 
 def showPic(img, title="Image", width=800, height=600):
     #img = cv2.resize(img, (width, height))
@@ -36,22 +56,7 @@ def getLPfromFileName(fp):
     fp = fp.split('/')
     
 
-# Define the directory paths
-# Validation Set ----
-# image_folder = Path('yolo_license_plate/dataset/images/validate')  # Folder containing the images
-# label_folder = Path('yolo_license_plate/yolov5/runs/detect/test_output6/labels')  # Folder containing the labels
 
-# Easy Set (Tutor-given images)
-image_folder = Path('yolo_license_plate/runs/detect/test_output8/crops/license_plate')  # Folder containing the images
-output_eval_folder = Path('results')
-
-# Ensure the output directory for cropped images exists
-output_eval_folder.mkdir(parents=True, exist_ok=True)
-
-paddle_ocr = PaddleOCR(use_angle_cls=True, lang='en')
-
-scores = []
-evals = []
 
 # Iterate over all images in the image folder
 for t, image_path in enumerate(image_folder.glob('*.jp*g')):  # Adjust file extension as needed (e.g., .png)
@@ -102,7 +107,7 @@ for t, image_path in enumerate(image_folder.glob('*.jp*g')):  # Adjust file exte
         scores += [0]
         evals += ["no plate"]
                 
-with open("results.txt", "w") as file:
+with open(f"{output_eval_folder}/results.txt", "w") as file:
     file.write(f'{scores}\n')
     
     file.write(f'{evals}\n')

@@ -1,10 +1,18 @@
 import os
 import subprocess
+from sys import path
+from pathlib import Path
+
+
+
+FILE = Path(__file__).resolve()
+ROOT = FILE.parents[0]  # YOLOv5 root directory
+if str(ROOT) not in path:
+    path.append(str(ROOT))  # add ROOT to PATH
+ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 # Define the path to your YOLOv5 directory
-yolov5_path = 'yolo_license_plate/yolov5'  # Now it is relative since it's in the same folder as the script
-
-
+yolov5_path = f'{ROOT}/yolov5'  # Now it is relative since it's in the same folder as the script
 
 # Define paths for the dataset and YAML file
 data_yaml = 'data.yaml'  # Relative path to the YAML file since it's one level up

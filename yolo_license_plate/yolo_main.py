@@ -1,33 +1,35 @@
 import os
-import cv2  
-import pandas as pd
 import subprocess
+from sys import path
 from pathlib import Path
 
+FILE = Path(__file__).resolve()
+ROOT = FILE.parents[0]  # YOLOv5 root directory
+if str(ROOT) not in path:
+    path.append(str(ROOT))  # add ROOT to PATH
+ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
+
+
 # Define the path to your YOLOv5 directory
-
-yolov5_path = 'yolov5'  # Adjust this path if needed
-image_folder = Path('yolo_license_plate/dataset/images/easy')  # Folder containing the images
-label_folder = Path('yolo_license_plate/runs/detect/test_output6/labels')  # Folder containing the labels
-
-
+yolov5_path = f'{ROOT}/yolov5'  # Adjust this path if needed
+image_folder = Path(f'{ROOT}/yolo_license_plate/dataset/images/easy')  # Folder containing the images
 
 # Define paths for the trained model weights and the image you want to test
-weights_path = 'runs/train/license_plate_model4/weights/best.pt'  # Path to your trained model weights
-image_path = 'dataset/images/easy'  # Replace with the path to the image you want to test
+weights_path = f'{ROOT}/runs/train/license_plate_model4/weights/best.pt'  # Path to your trained model weights
+image_path = f'{ROOT}/dataset/images/easy'  # Replace with the path to the image you want to test
 confidence_threshold = 0.6
 # Output folder for cropped images
 output_crop_folder = Path('runs/detect/test_output/crops')
 os.makedirs(output_crop_folder, exist_ok=True)
 
+
 # Construct the command to run YOLOv5 detection
 command = [
     "python", f"{yolov5_path}/detect.py",
-    "--weights", weights_path,
+    "--weights", f"{weights_path}",
     "--data", "data.yaml",
-    "--source", image_path,
+    "--source", f"{image_path}",
     "--img", "640",  # Use the same image size as during training
-    "--conf", "0.25",  # Confidence threshold (adjust as needed)
     "--save-txt",  # Save the detection results in a .txt file
     "--save-conf",  # Save confidence scores with the results
     "--project", "runs/detect",  # Folder to save the detection results
