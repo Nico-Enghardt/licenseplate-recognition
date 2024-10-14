@@ -12,7 +12,7 @@ data_yaml = '../data.yaml'  # Relative path to the YAML file since it's one leve
 weights = 'runs/train/license_plate_model3/weights/best.pt'  # Pre-trained weights file, which can be automatically downloaded
 
 # Number of epochs and image size (adjust based on your dataset and hardware)
-epochs = 50
+epochs = 100
 img_size = 640
 batch_size = 16
 

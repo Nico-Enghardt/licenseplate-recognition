@@ -1,10 +1,8 @@
 import cv2  
 import pandas as pd
 from pathlib import Path
-import pytesseract
 import numpy as np
 from fuzzywuzzy import fuzz
-import easyocr
 from paddleocr import PaddleOCR 
 
 
@@ -137,11 +135,11 @@ def straighten_lp(image):
 
 # Define the directory paths
 image_folder = Path('yolo_license_plate/dataset/images/validate')  # Folder containing the images
-label_folder = Path('yolo_license_plate/yolov5/runs/detect/test_output7/labels')  # Folder containing the labels
-output_crop_folder = Path('yolo_license_plate/yolov5/runs/detect/crops')
+label_folder = Path('yolo_license_plate/yolov5/runs/detect/test_output9/labels')  # Folder containing the labels
+output_eval_folder = Path('yolo_license_plate/results')
 
 # Ensure the output directory for cropped images exists
-output_crop_folder.mkdir(parents=True, exist_ok=True)
+output_eval_folder.mkdir(parents=True, exist_ok=True)
 
 # Define a scaling factor to reduce the size of the crop (e.g., 0.8 for 80% size)
 crop_scale = 1.3
@@ -156,13 +154,15 @@ options += " --psm {}".format(11)
 
 paddle_ocr = PaddleOCR(use_angle_cls=True, lang='en')
 
-correct_count = 0
 scores = []
+evals = []
 
 # Iterate over all images in the image folder
 for image_path in image_folder.glob('*.jpg'):  # Adjust file extension as needed (e.g., .png)
     # Generate the corresponding label file path
     label_path = label_folder / f"{image_path.stem}.txt"  # Match the label to the image by name
+
+    print('processing: ', image_path)
 
     # Check if the label file exists
     if label_path.is_file():
@@ -173,7 +173,6 @@ for image_path in image_folder.glob('*.jpg'):  # Adjust file extension as needed
         cols = ['class', 'x_center', 'y_center', 'width', 'height', 'confidence']
         detections = pd.read_csv(label_path, sep=' ', names=cols)
 
-        print('processing: ', image_path)
         # Get image dimensions
         h, w, _ = image.shape
         
@@ -201,8 +200,8 @@ for image_path in image_folder.glob('*.jpg'):  # Adjust file extension as needed
 
             license_plate = image[y_min:y_max, x_min:x_max]
 
-            crop_image_path = output_crop_folder / f"{image_path.stem}_crop_{index}.jpg"
-            cv2.imwrite(str(crop_image_path), license_plate)
+            # crop_image_path = output_eval_folder / f"{image_path.stem}_crop_{index}.jpg"
+            # cv2.imwrite(str(crop_image_path), license_plate)
                 
             lpText = ""
             try:
@@ -217,32 +216,42 @@ for image_path in image_folder.glob('*.jpg'):  # Adjust file extension as needed
                 # showPic(license_plateg)
                 lpDict[parsed] = lpDict.get(parsed, 0)+1
 
-            best_hit =  getLpText(lpDict)
-            print('best hit: ',best_hit)
-            # correctLP = imgfile.split('/')[-1][:-4]
-            correctLP = image_path.stem 
-            if best_hit == correctLP:
-                print('correct found!!!!!')
-                correct_count += 1
+        best_hit =  getLpText(lpDict)
+        print('best hit: ',best_hit)
+        # correctLP = imgfile.split('/')[-1][:-4]
+        correctLP = image_path.stem
+        
+        if best_hit == correctLP:
+            print('correct found!!!!!')
+            scores += [100]
+            evals += ["perfect"]
 
-                eval_image_path = output_crop_folder / f"../eval/{image_path.stem}_correct_pad_{index}.jpg"
-                cv2.imwrite(str(eval_image_path), license_plate)
-
+            eval_image_path = output_eval_folder / f"../eval/{image_path.stem}_correct_pad_{index}.jpg"
+            cv2.imwrite(str(eval_image_path), license_plate)
+    
+        elif best_hit:
+            score = fuzz.ratio(best_hit, correctLP)
+            scores += [score]
+            evals += ["partial match"]
+            print(f"Could achieve score of {score}")
             
-            elif len(lpDict) == 0:
-                eval_image_path = output_crop_folder / f"../eval/{image_path.stem}_nodetection_{index}.jpg"
-                cv2.imwrite(str(eval_image_path), license_plate)
+            eval_image_path = output_eval_folder / f"../eval/{image_path.stem}_{score}%_pad_{index}.jpg"
+            cv2.imwrite(str(eval_image_path), license_plate)
+        
+        else:
+            evals += ["ocr_failure"]
+            scores += [0]
+            eval_image_path = output_eval_folder / f"../eval/{image_path.stem}_nodetection_{index}.jpg"
+            cv2.imwrite(str(eval_image_path), license_plate)
                 
-            else: 
-                score = fuzz.ratio(best_hit, correctLP)
-                scores += [score]
-                print(f"Could achieve score of {score}")
+    else: 
+        scores += [0]
+        evals += ["no plate"]
                 
-                eval_image_path = output_crop_folder / f"../eval/{image_path.stem}_{score}%_pad_{index}.jpg"
-                cv2.imwrite(str(eval_image_path), license_plate)
-                
-
-print('correct count: ',correct_count)
-print('Average score:', np.mean(scores))
-print('Median score:', np.median(scores))
-                
+with open("results.txt", "w") as file:
+    file.write(f'{scores}')
+    
+    file.write(f'{evals}')
+    file.write(f'Average score: {np.mean(scores)}')
+    file.write(f'Median score: {np.median(scores)}')
+    file.write(f'correct count: {np.sum(np.where(scores==100))}')
