@@ -1,2 +1,10 @@
-venv/*
-test/*
+venv/
+test/
+.venv/
+__pycache__/
+*/yolov5
+yolo/runs/detect
+*/results.txt
+yolo/results/
+results/
+results.txt
