@@ -12,11 +12,11 @@ ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 # Define the path to your YOLOv5 directory
 yolov5_path = f'{ROOT}/yolov5'  # Adjust this path if needed
-image_folder = Path(f'{ROOT}/yolo_license_plate/dataset/images/easy')  # Folder containing the images
+image_folder = Path(f'{ROOT}/yolo_license_plate/dataset/images/tutor')  # Folder containing the images
 
 # Define paths for the trained model weights and the image you want to test
 weights_path = f'{ROOT}/runs/train/license_plate_model4/weights/best.pt'  # Path to your trained model weights
-image_path = f'{ROOT}/dataset/images/easy'  # Replace with the path to the image you want to test
+image_path = f'{ROOT}/dataset/images/tutor'  # Replace with the path to the image you want to test
 confidence_threshold = 0.6
 # Output folder for cropped images
 output_crop_folder = Path('runs/detect/test_output/crops')

@@ -247,7 +247,7 @@ def show_all_images(titles, images):
 ## MAIN FUNC BELOW
 
 
-dir = 'Images/easy'
+dir = 'Images/tutor'
 
 processAllInFolder(dir)
 

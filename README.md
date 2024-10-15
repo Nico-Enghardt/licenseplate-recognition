@@ -35,11 +35,11 @@ Specify yolov5 paths in `yolo_license_plate/yolo_main.py` as below:
 ```bash
 # Define the path to your YOLOv5 directory
 yolov5_path = 'yolov5'  # Adjust this path if needed
-image_folder = Path('yolo_license_plate/dataset/images/easy')  # Folder containing the images
+image_folder = Path('yolo_license_plate/dataset/images/tutor')  # Folder containing the images
 
 # Define paths for the trained model weights and the image you want to test
 weights_path = 'runs/train/license_plate_model4/weights/best.pt'  # Path to your trained model weights
-image_path = 'dataset/images/easy'  # Replace with the path to the image you want to test
+image_path = 'dataset/images/tutor'  # Replace with the path to the image you want to test
 confidence_threshold = 0.6 # how confident yolov5 needs to be before marking a license plate
 ```
 
